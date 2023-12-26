@@ -93,3 +93,7 @@ select {
 .item .content {
   @apply transition-all duration-1000
 }
+
+.group>li:last-child div {
+  @apply border-b-0
+}
