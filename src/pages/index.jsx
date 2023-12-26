@@ -1,5 +1,6 @@
 import { graphql } from "gatsby"
 import * as React from "react"
+import { useMediaQuery } from "@uidotdev/usehooks"
 
 import Work from "../svgs/work.svg"
 
@@ -10,14 +11,13 @@ import Seo from "../components/seo"
 
 const IndexPage = ({ data }) => {
   const cases = data.allWpPost.nodes
+  const menu = data.allWpMenu.nodes[0].cases_accordian.menuItem
+  const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)")
+
+  console.log("menu", menu)
   const [activeLink, setActiveLink] = React.useState("CAR ACCIDENTS")
   const [activeCaseData, setActiveCaseData] = React.useState(cases[0])
-  const [menudata, setMenudata] = React.useState([])
-
-  React.useEffect(() => {
-    const data = cases.map(item => item.custom_case.title)
-    setMenudata(data)
-  }, [cases])
+  const [menudata, setMenudata] = React.useState(menu)
 
   React.useEffect(() => {
     if (activeLink) {
@@ -28,6 +28,12 @@ const IndexPage = ({ data }) => {
       setActiveCaseData(getActiveData)
     }
   }, [activeLink, cases])
+
+  React.useEffect(() => {
+    if (isSmallDevice) {
+      setActiveLink(null)
+    }
+  }, [])
 
   const { title, tagline, description, image, ctaButtons } =
     activeCaseData.custom_case
@@ -49,20 +55,25 @@ const IndexPage = ({ data }) => {
         <section className="min-w-[1000px] flex max-lg:hidden">
           <div className="w-[35%] p-2 bg-navyblue-light">
             <ul className="group">
-              {menudata.map(link => {
+              {menudata.map(menu => {
                 return (
                   <li
-                    key={link.text}
+                    key={menu.title}
                     className={`${
-                      activeLink === link ? "bg-navyblue-dark/20" : ""
+                      activeLink === menu.title ? "bg-navyblue-dark/20" : ""
                     } cursor-pointer transition-all`}
-                    onClick={() => setActiveLink(link)}
+                    onClick={() => setActiveLink(menu.title)}
                   >
                     <div className="flex gap-4 items-center mx-5 border-b border-[#85B5C7] py-4 text-white font-semibold tracking-wide">
                       <span>
-                        <Work className="text-xs h-4" />
+                        <img
+                          src={menu.icon.sourceUrl}
+                          alt={menu.icon.altText}
+                          srcset={menu.icon.srcSet}
+                          width={20}
+                        />
                       </span>
-                      <p>{link}</p>
+                      <p>{menu.title}</p>
                     </div>
                   </li>
                 )
@@ -123,7 +134,7 @@ const IndexPage = ({ data }) => {
                       <div className="title flex gap-4 justify-between items-center mx-5 border-b border-[#85B5C7] py-4 text-white font-semibold tracking-wide">
                         <p>{item.custom_case.title}</p>
                         <span className="flex w-6 h-6 justify-center items-center border rounded-full">
-                          {item.custom_case.title === activeLink ? "+" : "-"}
+                          {item.custom_case.title === activeLink ? "-" : "+"}
                         </span>
                       </div>
                     </div>
@@ -198,6 +209,22 @@ export const query = graphql`
           }
           ctaButtons {
             catButton
+          }
+        }
+      }
+    }
+
+    allWpMenu {
+      nodes {
+        cases_accordian {
+          menuItem {
+            title
+            icon {
+              id
+              altText
+              sourceUrl
+              caption
+            }
           }
         }
       }
