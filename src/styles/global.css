@@ -39,6 +39,7 @@ body {
   scroll-behavior: smooth;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
+  font-family: 'Montserrat';
 }
 
 /* Remove list styles on ul, ol elements with a class attribute */
@@ -94,6 +95,6 @@ select {
   @apply transition-all duration-1000
 }
 
-.group>li:last-child div {
-  @apply border-b-0
+.group>li:last-child div, .item:last-child>div>div {
+  @apply border-b-0 !important
 }
